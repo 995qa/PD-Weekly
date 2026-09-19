@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   image:
@@ -93,3 +93,30 @@ jobs:
           name: puredarwin-minimal
           path: result/puredarwin-minimal.img
           if-no-files-found: error
+
+  create-release:
+    needs: [image-minimal, image]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create release directory
+        run: mkdir ./pdweekly
+
+      - name: Download minimal image
+        uses: actions/download-artifact@v4
+        with:
+          name: puredarwin-minimal
+          path: ./pdweekly
+
+      - name: Download full image
+        uses: actions/download-artifact@v4
+        with:
+          name: puredarwin
+          path: ./pdweekly
+
+      - name: Upload to Releases
+        uses: softprops/action-gh-release@v3.0.3
+        with:
+          files: pdweekly/*
+          tag_name: weekly
+          draft: false
+          prerelease: true
