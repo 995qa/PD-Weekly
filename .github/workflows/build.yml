@@ -1,0 +1,95 @@
+name: PureDarwin Weekly
+
+on:
+  schedule:
+    # Runs every Sunday at 00:00 UTC
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+concurrency:
+  group: build-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: Build image
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+
+      - name: Reclaim space
+        uses: insightsengineering/disk-space-reclaimer@v1
+        with:
+            android: true
+            dotnet: true
+            haskell: true
+            large-packages: true
+            swap-storage: true
+            docker-images: true
+
+      - name: Clone PureDarwin
+        uses: actions/checkout@v4
+        with:
+          repository: 'PureDarwin/PureDarwin'
+          ref: 'upstream-xnu-12377'
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+
+      - name: Build full image
+        run: nix build .#image
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: puredarwin
+          path: result/puredarwin.img
+          if-no-files-found: error
+
+  image-minimal:
+    name: Build image-minimal
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+
+    steps:
+
+      - name: Reclaim space
+        uses: insightsengineering/disk-space-reclaimer@v1
+        with:
+            android: true
+            dotnet: true
+            haskell: true
+            large-packages: true
+            swap-storage: true
+            docker-images: true
+
+      - name: Clone PureDarwin
+        uses: actions/checkout@v4
+        with:
+          repository: 'PureDarwin/PureDarwin'
+          ref: 'upstream-xnu-12377'
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v31
+        with:
+          extra_nix_config: |
+            experimental-features = nix-command flakes
+            accept-flake-config = true
+
+      - name: Build minimal image
+        run: nix build .#image-minimal
+
+      - name: Upload image
+        uses: actions/upload-artifact@v4
+        with:
+          name: puredarwin-minimal
+          path: result/puredarwin-minimal.img
+          if-no-files-found: error
