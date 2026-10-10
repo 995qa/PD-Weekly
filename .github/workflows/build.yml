@@ -2,10 +2,10 @@ name: PureDarwin Weekly
 
 on:
   schedule:
-    # Runs every Sunday at 00:00 UTC
-    - cron: '0 0 * * 0'
+  - cron: '0 4 * * 5'
+    timezone: 'America/New_York'
   workflow_dispatch:
-
+  
 concurrency:
   group: build-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
