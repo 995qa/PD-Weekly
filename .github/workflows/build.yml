@@ -51,7 +51,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: puredarwin-wayland-minimal
-          path: result/puredarwin.img
+          path: result/puredarwin-wayland-minimal.img
           if-no-files-found: error
 
   image-minimal:
