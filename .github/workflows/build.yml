@@ -14,8 +14,8 @@ permissions:
   contents: write
 
 jobs:
-  image:
-    name: Build image
+  image-wayland-minimal:
+    name: Build wayland image
     runs-on: ubuntu-latest
     timeout-minutes: 360
 
@@ -44,13 +44,13 @@ jobs:
             experimental-features = nix-command flakes
             accept-flake-config = true
 
-      - name: Build full image
-        run: nix build .#image
+      - name: Build wayland-minimal
+        run: nix build .#image-wayland-minimal
 
       - name: Upload image
         uses: actions/upload-artifact@v4
         with:
-          name: puredarwin
+          name: puredarwin-wayland-minimal
           path: result/puredarwin.img
           if-no-files-found: error
 
@@ -95,7 +95,7 @@ jobs:
           if-no-files-found: error
 
   create-release:
-    needs: [image-minimal, image]
+    needs: [image-minimal, image-wayland-minimal]
     runs-on: ubuntu-latest
     steps:
       - name: Create release directory
@@ -110,13 +110,13 @@ jobs:
       - name: Download full image
         uses: actions/download-artifact@v4
         with:
-          name: puredarwin
+          name: puredarwin-wayland-minimal
           path: ./pdweekly
 
       # puredarwin.img is too big
       - name: Compress images
         run: |
-          zip -j ./pdweeklyzipped/puredarwin.zip ./pdweekly/puredarwin.img
+          zip -j ./pdweeklyzipped/puredarwin-wayland-minimal.zip ./pdweekly/puredarwin-wayland-minimal.img
           zip -j ./pdweeklyzipped/puredarwin-minimal.zip ./pdweekly/puredarwin-minimal.img
           # sanity check rq
           echo pdweekly:
