@@ -14,45 +14,48 @@ permissions:
   contents: write
 
 jobs:
-  image-wayland-minimal:
-    name: Build wayland image
-    runs-on: ubuntu-latest
-    timeout-minutes: 360
 
-    steps:
+# Can't compile due to manual seeding of metallibs required
 
-      - name: Reclaim space
-        uses: insightsengineering/disk-space-reclaimer@v1
-        with:
-            android: true
-            dotnet: true
-            haskell: true
-            large-packages: true
-            swap-storage: true
-            docker-images: true
+#  image-wayland-minimal:
+#    name: Build wayland image
+#    runs-on: ubuntu-latest
+#    timeout-minutes: 360
+#
+#    steps:
+#
+#      - name: Reclaim space
+#        uses: insightsengineering/disk-space-reclaimer@v1
+#        with:
+#            android: true
+#            dotnet: true
+#            haskell: true
+#            large-packages: true
+#            swap-storage: true
+#            docker-images: true
+#
+#      - name: Clone PureDarwin
+#        uses: actions/checkout@v4
+#        with:
+#          repository: 'PureDarwin/PureDarwin'
+#          ref: 'upstream-xnu-12377'
 
-      - name: Clone PureDarwin
-        uses: actions/checkout@v4
-        with:
-          repository: 'PureDarwin/PureDarwin'
-          ref: 'upstream-xnu-12377'
+#      - name: Install Nix
+#        uses: cachix/install-nix-action@v31
+#        with:
+#          extra_nix_config: |
+#            experimental-features = nix-command flakes
+#            accept-flake-config = true
 
-      - name: Install Nix
-        uses: cachix/install-nix-action@v31
-        with:
-          extra_nix_config: |
-            experimental-features = nix-command flakes
-            accept-flake-config = true
+#      - name: Build wayland-minimal
+#        run: nix build .#image-wayland-minimal
 
-      - name: Build wayland-minimal
-        run: nix build .#image-wayland-minimal
-
-      - name: Upload image
-        uses: actions/upload-artifact@v4
-        with:
-          name: puredarwin-wayland-minimal
-          path: result/puredarwin-wayland-minimal.img
-          if-no-files-found: error
+#      - name: Upload image
+#        uses: actions/upload-artifact@v4
+#        with:
+#          name: puredarwin-wayland-minimal
+#          path: result/puredarwin-wayland-minimal.img
+#          if-no-files-found: error
 
   image-minimal:
     name: Build image-minimal
@@ -95,7 +98,8 @@ jobs:
           if-no-files-found: error
 
   create-release:
-    needs: [image-minimal, image-wayland-minimal]
+#    needs: [image-minimal, image-wayland-minimal]
+    needs: [image-minimal]
     runs-on: ubuntu-latest
     steps:
       - name: Create release directory
